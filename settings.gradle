@@ -1,0 +1,3 @@
+rootProject.name = "Runtime Logger"
+include ':app'
+include ':runtimelogger'
