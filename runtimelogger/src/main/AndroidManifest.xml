@@ -19,12 +19,13 @@
             android:taskAffinity="com.rakeshgurudu.android.runtimelogger.${applicationId}">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity-alias>
 
         <provider
-            android:name="com.rakeshgurudu.android.runtimelogger.core.LoggerFileProvider"
+            android:name=".core.LoggerFileProvider"
             android:authorities="com.rakeshgurudu.android.runtimelogger.provider"
             android:exported="false"
             android:grantUriPermissions="true">
@@ -32,6 +33,12 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <receiver
+            android:name=".core.RuntimeLogger$LoggingBroadcastReceiver"
+            android:enabled="true"
+            android:exported="false"></receiver>
+
     </application>
 
 </manifest>

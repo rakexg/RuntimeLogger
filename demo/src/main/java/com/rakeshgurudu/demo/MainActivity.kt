@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         super.onBackPressed()
-        RuntimeLogger.endLogging()
+        RuntimeLogger.endLogging(this@MainActivity)
         stopLogging = true
     }
 }

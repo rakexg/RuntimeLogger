@@ -9,5 +9,10 @@
     <string name="file_delete_success">%1$s deleted successfully</string>
     <string name="file_delete_fail">Unable to delete %1$s</string>
     <string name="empty_logs">No logs available</string>
+    <string name="current_session">Current session %1$s</string>
+    <string name="last_session">Last session %1$s</string>
+    <string name="start_session">Start</string>
+    <string name="stop_session">Stop</string>
+    <string name="save_session">Save</string>
 
 </resources>
