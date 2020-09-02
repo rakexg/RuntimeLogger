@@ -24,9 +24,15 @@
             </intent-filter>
         </activity-alias>
 
+        <!--This config is merged in with the host app's manifest,
+        but there can only be one provider with the same authority activated at any given
+        point; so if the end user has two or more different apps using this library, only the
+        first one will be able to use the provider. To work around this problem, we use the
+        following placeholder in the authority to identify each host application as if it was
+        a completely different provider.-->
         <provider
             android:name=".core.LoggerFileProvider"
-            android:authorities="com.rakeshgurudu.android.runtimelogger.provider"
+            android:authorities="${applicationId}.RuntimeLoggerFileProvider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
@@ -37,7 +43,7 @@
         <receiver
             android:name=".core.RuntimeLogger$LoggingBroadcastReceiver"
             android:enabled="true"
-            android:exported="false"></receiver>
+            android:exported="false" />
 
     </application>
 
