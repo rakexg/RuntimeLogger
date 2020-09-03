@@ -6,7 +6,7 @@
         android:id="@+id/delete_all"
         android:orderInCategory="1"
         android:title="@string/delete_all"
-        app:showAsAction="always" />
+        app:showAsAction="never" />
 
 
 </menu>
