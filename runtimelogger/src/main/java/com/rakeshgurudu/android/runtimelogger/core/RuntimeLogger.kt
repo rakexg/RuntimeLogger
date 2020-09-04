@@ -31,85 +31,162 @@ object RuntimeLogger {
     private const val MAX_LINES = 200
     private var stopLogging: Boolean = false
     private var startTime = 0L
-    var logDirectoryPath: String = ""
+    private val separator = System.getProperty("line.separator")!!
+    private val pid = android.os.Process.myPid()
+    private val tid = android.os.Process.myTid()
     private val TAG = RuntimeLogger::class.java.simpleName
+    var logDirectoryPath: String = ""
 
     @SuppressLint("ConstantLocale")
     private val dateFormat = SimpleDateFormat("dd MMM yyyy HH:mm:ss", Locale.getDefault())
 
+    @SuppressLint("ConstantLocale")
+    private val logDateFormat = SimpleDateFormat("MM-dd HH:mm:ss.SSS", Locale.getDefault())
+
+    /**
+     * Regex to match the logs received. Format of the logs is as below:
+     * MM-dd HH:mm:ss.SSS ProcessId ThreadId LogLevel TAG: log message
+     * eg. 09-04 18:05:15.563 4868 4868 I MultiDex: VM with version 2.1.0 has multidex support
+     */
+    private val logRegexPattern =
+        Regex("(\\d+)\\s+(\\d+-\\d+\\s+\\d+:\\d+:\\d+.\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(.)\\s+(.+?):\\s+(.+)")
+
+    /**
+     * Call this method to start saving logs. The logs will be stored in app specific directory
+     * of external storage. It is recommended to increase the device log buffer size from
+     * Settings -> Developer Options -> Logger Buffer sizes, select 4M or 16M.
+     */
     fun startLogging(context: Context) {
         startTime = System.currentTimeMillis()
         fileName = dateFormat.format(startTime)
         logDirectoryPath = context.getExternalFilesDir(null)?.absolutePath + "/runtimelogger"
         stopLogging = false
-        val pid = android.os.Process.myPid()
-        Runtime.getRuntime().exec("logcat -P '$pid'")
         val thread = Thread(Runnable {
-            logData()
+            logBuffer(false, 0, StringBuilder())
         })
         thread.name = "Runtime Logger"
         thread.start()
         createNotification(context)
-        Log.e(TAG, "started logging for session $fileName for process $pid")
     }
 
-    private fun logData(): String {
+    /**
+     * Reads log messages by executing "logcat" command in a process and saves in a file. The logs are
+     * saved in file when MAX_LINES are reached. When the log buffer is full the process ends with errorStream "read: unexpected EOF!".
+     * So to continue logging, the process is again started with the timestamp of the last received log.
+     * The log buffer size of the device can be found by command "adb logcat -g" and it can be increased from
+     * Settings -> Developer Options -> Logger Buffer sizes.
+     */
+    private fun logBuffer(
+        lastStopReading: Boolean,
+        lastLineCount: Int,
+        logBuilder: StringBuilder,
+        logTimed: String = ""
+    ) {
         try {
-            val logCatCommand = StringBuilder()
-            val pid = android.os.Process.myPid()
-            logCatCommand.append("logcat --pid=$pid")
-            val process = Runtime.getRuntime().exec(logCatCommand.toString())//.waitFor()
-            val bufferedReader = BufferedReader(InputStreamReader(process.inputStream))
-            val log = StringBuilder()
-            val separator = System.getProperty("line.separator")
-            var line: String?
-            var lineCount = 0
-            var stopReading = false
-            while (bufferedReader.readLine().also { line = it } != null && !stopReading) {
+            val lineBuilder = StringBuilder()
+            var stopReading = lastStopReading
+            var lineCount = lastLineCount
+            val process =
+                if (logTimed.isNotEmpty()) {
+                    //arrayOf("logcat", "-T", "09-03 12:35:10.982")
+                    Runtime.getRuntime().exec(arrayOf("logcat", "-T", logTimed))
+                } else {
+                    Runtime.getRuntime().exec(arrayOf("logcat", "--pid=$pid"))//.waitFor()
+                }
+            val bufferedReader = process.inputStream.bufferedReader()
+            var endOfBuffer = false
+            while (bufferedReader.readLine().also {
+                    if (it != null) {
+                        lineBuilder.delete(0, lineBuilder.length)
+                        lineBuilder.append(it)
+                    } else {
+                        endOfBuffer = true
+                    }
+                } != null && !stopReading) {
+                /*if (log.contains(line)) {
+                    continue
+                }*/
                 lineCount = ++lineCount
-                log.append("$lineCount ")
-                log.append(line)
-                log.append(separator)
+                logBuilder.append("$lineCount ")
+                logBuilder.append(lineBuilder)
+                logBuilder.append(separator)
                 if (stopLogging) {
+                    appendLibraryLogs(
+                        ++lineCount,
+                        logBuilder,
+                        "stopped logging for session $fileName and exiting"
+                    )
                     stopReading = true
                 }
                 if (lineCount % MAX_LINES == 0 || broadCastSaveLog) {
                     broadCastSaveLog = false
-                    saveLog(log)
-                    log.delete(0, log.length) // clear
+                    saveLog(++lineCount, logBuilder)
                 }
             }
-            if (log.isNotEmpty()) {
-                saveLog(log)
+            destroyProcess(process)
+            if (endOfBuffer && !stopReading) {
+                //The lineBuilder received does not contain the line number so adding a dummy line number 123
+                val lastLineTime =
+                    logRegexPattern.find("123 $lineBuilder")?.destructured?.component2()
+                if (lastLineTime != null) {
+                    appendLibraryLogs(
+                        ++lineCount,
+                        logBuilder,
+                        "starting new process with time $lastLineTime"
+                    )
+                    if (logBuilder.isNotEmpty()) {
+                        saveLog(++lineCount, logBuilder)
+                    }
+                    logBuffer(stopReading, lineCount, logBuilder, lastLineTime)
+                } else {
+                    val currentTime = System.currentTimeMillis()
+                    appendLibraryLogs(
+                        ++lineCount,
+                        logBuilder,
+                        "starting new process with current time $currentTime"
+                    )
+                    logBuffer(stopReading, lineCount, logBuilder, logDateFormat.format(currentTime))
+                }
+            } else {
+                if (logBuilder.isNotEmpty()) {
+                    saveLog(++lineCount, logBuilder)
+                }
             }
-            return log.toString()
-        } catch (ioe: IOException) {
-            return "Error retrieving logcat info"
+        } catch (ex: Exception) {
+            Log.e(TAG, "logData Exception: ", ex)
         }
     }
 
+    /**
+     * Call this method to end saving logs
+     */
     fun endLogging(context: Context) {
-        //TODO: handle case where endLogging is called before start
         stopSession()
         NotificationManagerCompat.from(context).cancel(NOTIFICATION_ID)
-        Log.e(TAG, "Exiting")
     }
 
     private fun stopSession() {
         if (startTime != 0L) {
-            Log.e("RuntimeLogger", "endLogging")
             stopLogging = true
             startTime = 0
-            val logCatCommand = StringBuilder()
-            logCatCommand.append("logcat -c")
-            Runtime.getRuntime().exec(logCatCommand.toString())
-            Log.e(TAG, "stopped logging for session $fileName and exiting")
         }
     }
 
-    private fun saveLog(
-        logString: CharSequence?
-    ): Boolean {
+    /**
+     * Appends this library logs to the log StringBuilder. These logs will be visible in the saved
+     * log file
+     */
+    private fun appendLibraryLogs(lineCount: Int, log: StringBuilder, line: String?) {
+        log.append("$lineCount")
+        log.append(" ${logDateFormat.format(System.currentTimeMillis())} $pid $tid I $TAG:")
+        log.append(line)
+        log.append(separator)
+    }
+
+    /**
+     * Saves logs in a file with filename as the time when {@link #startLogging(Context)} was called.
+     */
+    private fun saveLog(lineCount: Int, log: StringBuilder): Boolean {
         val logDir = File(logDirectoryPath)
         if (!logDir.exists()) {
             logDir.mkdir()
@@ -123,6 +200,7 @@ object RuntimeLogger {
         } catch (ex: IOException) {
             return false
         }
+        appendLibraryLogs(lineCount, log, "saving logging session for $fileName")
         var out: PrintStream? = null
         try {
             out = PrintStream(
@@ -131,17 +209,18 @@ object RuntimeLogger {
                     BUFFER
                 )
             )
-
-            if (logString != null) {
-                out.print(logString)
-            }
-        } catch (ex: FileNotFoundException) {
+            out.print(log)
+        } catch (ex: Exception) {
             return false
         } finally {
             out?.close()
+            log.delete(0, log.length) //clear
         }
-        Log.e(TAG, "saved logging session for $fileName")
         return true
+    }
+
+    private fun destroyProcess(process: Process) {
+        process.destroy()
     }
 
 
@@ -213,9 +292,13 @@ object RuntimeLogger {
         }
     }
 
+    /**
+     * Receives broadcast messages from notification buttons. The logging can be started, saved and
+     * stopped from the ongoing notification.
+     */
     class LoggingBroadcastReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            Log.e("MyBroadcastReceiver", "onReceive: ")
+            Log.e(TAG, "onReceive: ${intent?.action}")
             when (intent?.action) {
                 NOTIFICATION_ACTION_START -> {
                     startLogging(context!!)
