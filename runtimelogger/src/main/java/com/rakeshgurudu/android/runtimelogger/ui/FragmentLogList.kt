@@ -105,7 +105,7 @@ class FragmentLogList : Fragment() {
                                 val fileUri =
                                     FileProvider.getUriForFile(
                                         view.context,
-                                        "com.rakeshgurudu.android.runtimelogger.provider",
+                                        "${context?.packageName}.RuntimeLoggerFileProvider",
                                         File(file.absolutePath)
                                     )
                                 shareIntent.putExtra(Intent.EXTRA_STREAM, fileUri)
