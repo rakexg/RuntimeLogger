@@ -13,7 +13,10 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.rakeshgurudu.android.runtimelogger.R
 import com.rakeshgurudu.android.runtimelogger.ui.RuntimeLoggerActivity
-import java.io.*
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.PrintStream
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -27,7 +30,6 @@ const val NOTIFICATION_ACTION_SAVE = "save_log"
 object RuntimeLogger {
     private var broadCastSaveLog: Boolean = false
     private var fileName: String = ""
-    private const val BUFFER = 0x1000 // 4K
     private const val MAX_LINES = 200
     private var stopLogging: Boolean = false
     private var startTime = 0L
@@ -36,6 +38,7 @@ object RuntimeLogger {
     private val tid = android.os.Process.myTid()
     private val TAG = RuntimeLogger::class.java.simpleName
     var logDirectoryPath: String = ""
+    private var startLoggingFromNotification: Boolean = false
 
     @SuppressLint("ConstantLocale")
     private val dateFormat = SimpleDateFormat("dd MMM yyyy HH:mm:ss", Locale.getDefault())
@@ -57,6 +60,15 @@ object RuntimeLogger {
      * Settings -> Developer Options -> Logger Buffer sizes, select 4M or 16M.
      */
     fun startLogging(context: Context) {
+        val logOnAppStartup = context.getSharedPreferences(
+            context.getString(R.string.runtime_logger_shared_prefs),
+            Context.MODE_PRIVATE
+        ).getBoolean(context.getString(R.string.log_on_startup), false)
+        if (!logOnAppStartup && !startLoggingFromNotification) {
+            appStartupOffNotification(context)
+            return
+        }
+        startLoggingFromNotification = false
         startTime = System.currentTimeMillis()
         fileName = dateFormat.format(startTime)
         logDirectoryPath = context.getExternalFilesDir(null)?.absolutePath + "/runtimelogger"
@@ -66,8 +78,11 @@ object RuntimeLogger {
         })
         thread.name = "Runtime Logger"
         thread.start()
-        createNotification(context)
+        generalNotification(context)
     }
+
+    internal fun getLogDirectoryPath(context: Context) =
+        context.getExternalFilesDir(null)?.absolutePath + "/runtimelogger"
 
     /**
      * Reads log messages by executing "logcat" command in a process and saves in a file. The logs are
@@ -204,10 +219,7 @@ object RuntimeLogger {
         var out: PrintStream? = null
         try {
             out = PrintStream(
-                BufferedOutputStream(
-                    FileOutputStream(newFile, true),
-                    BUFFER
-                )
+                FileOutputStream(newFile, true).buffered()
             )
             out.print(log)
         } catch (ex: Exception) {
@@ -223,8 +235,7 @@ object RuntimeLogger {
         process.destroy()
     }
 
-
-    private fun createNotification(context: Context) {
+    private fun createNotification(context: Context): NotificationCompat.Builder {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val mChannel = NotificationChannel(
                 CHANNEL_ID,
@@ -240,13 +251,16 @@ object RuntimeLogger {
         }
         val clickIntent = PendingIntent.getActivity(context, 0, intent, 0)
 
-        val mBuilder = NotificationCompat.Builder(context, CHANNEL_ID)
+        return NotificationCompat.Builder(context, CHANNEL_ID)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setSmallIcon(R.drawable.ic_log_format)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setContentIntent(clickIntent)
+    }
 
+    private fun generalNotification(context: Context) {
+        val mBuilder = createNotification(context)
         if (stopLogging) {
             mBuilder.setContentText(
                 String.format(
@@ -286,7 +300,27 @@ object RuntimeLogger {
                 PendingIntent.getBroadcast(context, 0, saveIntent, 0)
             )
         }
+        with(NotificationManagerCompat.from(context)) {
+            notify(NOTIFICATION_ID, mBuilder.build())
+        }
+    }
 
+    private fun appStartupOffNotification(context: Context) {
+        val mBuilder = createNotification(context)
+        mBuilder.setContentText(
+            String.format(
+                context.getString(R.string.start_logging_session),
+                fileName
+            )
+        )
+        val startIntent = Intent(context, LoggingBroadcastReceiver::class.java).apply {
+            action = NOTIFICATION_ACTION_START
+        }
+        mBuilder.addAction(
+            0,
+            context.getString(R.string.start_session),
+            PendingIntent.getBroadcast(context, 0, startIntent, 0)
+        )
         with(NotificationManagerCompat.from(context)) {
             notify(NOTIFICATION_ID, mBuilder.build())
         }
@@ -301,11 +335,12 @@ object RuntimeLogger {
             Log.e(TAG, "onReceive: ${intent?.action}")
             when (intent?.action) {
                 NOTIFICATION_ACTION_START -> {
+                    startLoggingFromNotification = true
                     startLogging(context!!)
                 }
                 NOTIFICATION_ACTION_STOP -> {
                     stopSession()
-                    createNotification(context!!)
+                    generalNotification(context!!)
                 }
                 NOTIFICATION_ACTION_SAVE -> {
                     broadCastSaveLog = true

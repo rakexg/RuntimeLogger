@@ -11,8 +11,15 @@
     <string name="empty_logs">No logs available</string>
     <string name="current_session">Current session %1$s</string>
     <string name="last_session">Last session %1$s</string>
+    <string name="start_logging_session">Start runtime logging session</string>
     <string name="start_session">Start</string>
     <string name="stop_session">Stop</string>
     <string name="save_session">Save</string>
+    <string name="runtime_logger_shared_prefs">runtime_logger_shared_prefs</string>
+    <string name="log_on_startup">log_on_startup</string>
+    <string name="settings_screen">Settings</string>
+    <string name="settings_app_startup_title">Log on app startup</string>
+    <string name="app_startup_logging_enabled">Logging will be started on main app startup</string>
+    <string name="app_startup_logging_disabled">Logging will be disabled on main app startup</string>
 
 </resources>

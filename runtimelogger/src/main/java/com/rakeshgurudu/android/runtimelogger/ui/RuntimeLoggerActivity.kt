@@ -49,6 +49,10 @@ class RuntimeLoggerActivity : AppCompatActivity() {
                 fragmentLogList?.deleteAllFiles()
                 return true
             }
+            R.id.settings -> {
+                launchFragment(FragmentSettings.newInstance(), R.id.fragment_container, true)
+                return true
+            }
         }
         return false
     }

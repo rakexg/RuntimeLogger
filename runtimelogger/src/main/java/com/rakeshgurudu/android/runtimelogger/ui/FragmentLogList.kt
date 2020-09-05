@@ -25,20 +25,7 @@ class FragmentLogList : Fragment() {
 
     companion object {
         @JvmStatic
-        fun newInstance(): FragmentLogList {
-            return FragmentLogList().apply {
-                arguments = Bundle().apply {
-                    //putInt(ARG_VIEW_TYPE, viewType)
-                }
-            }
-        }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            //viewType = it.getInt(ARG_VIEW_TYPE)
-        }
+        fun newInstance() = FragmentLogList()
     }
 
     override fun onCreateView(
@@ -141,8 +128,10 @@ class FragmentLogList : Fragment() {
 
     private fun fetchData() {
         mainRV.visibility = View.VISIBLE
-        val folder = File(RuntimeLogger.logDirectoryPath)
+        val folder = File(RuntimeLogger.getLogDirectoryPath(requireContext()))
         if (!folder.exists()) {
+            msgTV.visibility = View.VISIBLE
+            msgTV.text = getString(R.string.empty_logs)
             return
         }
         val listOfFiles: Array<File>? = folder.listFiles()
@@ -174,7 +163,7 @@ class FragmentLogList : Fragment() {
     }
 
     fun deleteAllFiles() {
-        val folder = File(RuntimeLogger.logDirectoryPath)
+        val folder = File(RuntimeLogger.getLogDirectoryPath(requireContext()))
         if (!folder.exists()) {
             Toast.makeText(
                 context,

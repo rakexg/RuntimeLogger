@@ -1,0 +1,35 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:windowBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:padding="15dp">
+
+    <TextView
+        android:id="@+id/appStartupTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_toStartOf="@id/appStartupSwitch"
+        android:layout_toLeftOf="@id/appStartupSwitch"
+        android:text="@string/settings_app_startup_title"
+        android:textColor="@android:color/white" />
+
+    <TextView
+        android:id="@+id/appStartupSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/appStartupTitle"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:text="@string/app_startup_logging_disabled" />
+
+    <Switch
+        android:id="@+id/appStartupSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:padding="10dp" />
+</RelativeLayout>
