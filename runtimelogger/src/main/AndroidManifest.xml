@@ -7,14 +7,13 @@
         <activity
             android:name=".ui.RuntimeLoggerActivity"
             android:icon="@drawable/ic_log_format"
-            android:label="@string/activity_label"
             android:taskAffinity="com.rakeshgurudu.android.runtimelogger.${applicationId}"
             android:theme="@style/LoggerTheme" />
 
         <activity-alias
             android:name=".ui.RuntimeLoggerActivity"
             android:icon="@drawable/ic_log_format"
-            android:label="@string/activity_label"
+            android:label="${runtimeLoggerLauncherPrefix} Runtime Logger"
             android:targetActivity=".ui.RuntimeLoggerActivity"
             android:taskAffinity="com.rakeshgurudu.android.runtimelogger.${applicationId}">
             <intent-filter>

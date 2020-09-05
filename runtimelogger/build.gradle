@@ -12,6 +12,7 @@ android {
         versionCode 1
         versionName "0.1.0"
 
+        manifestPlaceholders = [runtimeLoggerLauncherPrefix: '${runtimeLoggerLauncherPrefix}']
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
