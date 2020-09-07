@@ -11,6 +11,7 @@ android {
         targetSdkVersion 29
         versionCode 2
         versionName "1.0.0"
+        vectorDrawables.useSupportLibrary = true
 
         manifestPlaceholders = [runtimeLoggerLauncherPrefix: '${runtimeLoggerLauncherPrefix}']
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
