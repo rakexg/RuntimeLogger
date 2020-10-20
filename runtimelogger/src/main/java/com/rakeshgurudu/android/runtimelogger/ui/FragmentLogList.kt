@@ -1,5 +1,6 @@
 package com.rakeshgurudu.android.runtimelogger.ui
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -50,26 +51,7 @@ class FragmentLogList : Fragment() {
                         val log = item as LogModel
                         val file = File(log.filePath)
                         if (file.exists()) {
-                            if (file.delete()) {
-                                fetchData()
-                                Toast.makeText(
-                                    view.context,
-                                    String.format(
-                                        getString(R.string.file_delete_success),
-                                        log.fileName
-                                    ),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            } else {
-                                Toast.makeText(
-                                    view.context,
-                                    String.format(
-                                        getString(R.string.file_delete_fail),
-                                        log.fileName
-                                    ),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
+                            deleteFile(file, log)
                         } else {
 
                             Toast.makeText(
@@ -162,26 +144,65 @@ class FragmentLogList : Fragment() {
 
     }
 
+    fun deleteFile(file: File, log: LogModel) {
+        val dialog = AlertDialog.Builder(context)
+                .setTitle(getString(R.string.delete_file))
+                .setMessage(getString(R.string.delete_confirmation))
+                .setPositiveButton(getString(R.string.delete)) { _, _ ->
+                    if (file.delete()) {
+                        fetchData()
+                        Toast.makeText(
+                                view?.context,
+                                String.format(
+                                        getString(R.string.file_delete_success),
+                                        log.fileName
+                                ),
+                                Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        Toast.makeText(
+                                view?.context,
+                                String.format(
+                                        getString(R.string.file_delete_fail),
+                                        log.fileName
+                                ),
+                                Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+                .setNegativeButton(getString(android.R.string.cancel)) { dialog, _ -> dialog.dismiss() }
+                .create()
+        dialog.show()
+    }
+
     fun deleteAllFiles() {
         val folder = File(RuntimeLogger.getLogDirectoryPath(requireContext()))
         if (!folder.exists()) {
             Toast.makeText(
-                context,
-                getString(R.string.dir_unavailable),
-                Toast.LENGTH_SHORT
+                    context,
+                    getString(R.string.dir_unavailable),
+                    Toast.LENGTH_SHORT
             ).show()
             return
         }
-        val listOfFiles: Array<File>? = folder.listFiles()
-        if (listOfFiles != null) {
-            for (file in listOfFiles) {
-                if (!file.isDirectory) {
-                    file.delete()
+        val dialog = AlertDialog.Builder(context)
+                .setTitle(getString(R.string.delete_file))
+                .setMessage(getString(R.string.delete_all_confirmation))
+                .setPositiveButton(getString(R.string.delete)) { _, _ ->
+                    val listOfFiles: Array<File>? = folder.listFiles()
+                    if (listOfFiles != null) {
+                        for (file in listOfFiles) {
+                            if (!file.isDirectory) {
+                                file.delete()
+                            }
+                        }
+                    }
+                    Toast.makeText(context, getString(R.string.all_files_deleted), Toast.LENGTH_SHORT).show()
+                    fetchData()
                 }
-            }
-        }
-        Toast.makeText(context, getString(R.string.all_files_deleted), Toast.LENGTH_SHORT).show()
-        fetchData()
+                .setNegativeButton(getString(android.R.string.cancel)) { dialog, _ -> dialog.dismiss() }
+                .create()
+        dialog.show()
     }
 
     //Extension functions to get file size in KB, MB, GB and TB

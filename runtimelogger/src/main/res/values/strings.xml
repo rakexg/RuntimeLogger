@@ -3,10 +3,14 @@
     <string name="activity_label">Runtime Logger</string>
     <string name="delete_all">Delete All</string>
     <string name="all_files_deleted">All log files deleted</string>
-    <string name="dir_unavailable">Log directory does not exists yet</string>
+    <string name="delete_confirmation">Are you sure you want to delete file?</string>
+    <string name="delete_all_confirmation">Are you sure you want to delete all file?</string>
+    <string name="delete_file">Delete File</string>
+    <string name="delete">Delete</string>
+    <string name="dir_unavailable">Log directory does not exist</string>
     <string name="attach_file_failed">Unable to attach file.</string>
     <string name="file_not_exists">%1$s does not exist at path %2$s</string>
-    <string name="file_delete_success">%1$s deleted successfully</string>
+    <string name="file_delete_success">%1$s deleted</string>
     <string name="file_delete_fail">Unable to delete %1$s</string>
     <string name="empty_logs">No logs available</string>
     <string name="current_session">Current session %1$s</string>
