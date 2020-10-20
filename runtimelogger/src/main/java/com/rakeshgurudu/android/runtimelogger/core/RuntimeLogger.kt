@@ -74,7 +74,7 @@ object RuntimeLogger {
         logDirectoryPath = context.getExternalFilesDir(null)?.absolutePath + "/runtimelogger"
         stopLogging = false
         val thread = Thread(Runnable {
-            logBuffer(false, 0, StringBuilder())
+            logBuffer(false, 0, DeviceInfoLogger().getLogData(context))
         })
         thread.name = "Runtime Logger"
         thread.start()
