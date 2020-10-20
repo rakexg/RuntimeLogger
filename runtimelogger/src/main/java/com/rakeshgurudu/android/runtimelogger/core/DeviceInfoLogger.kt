@@ -66,6 +66,9 @@ class DeviceInfoLogger {
         getMemoryUsage(builder)
         builder.append(LINE_SEPARATOR)
 
+        getDeviceRAM(context, builder)
+        builder.append(LINE_SEPARATOR)
+
         builder.append("App version        : ")
         builder.append(context.packageManager.getPackageInfo(context.packageName, 0).versionName)
         @Suppress("DEPRECATION")
@@ -122,15 +125,21 @@ class DeviceInfoLogger {
 
     private fun getMemoryUsage(builder: StringBuilder) {
         val info = Runtime.getRuntime()
-        val totalMemory = info.totalMemory()
-        builder.append("Total Memory GB    : ")
-        builder.append(totalMemory / 1024 / 1024)
-        builder.append(LINE_SEPARATOR)
-        builder.append("Free Memory MB     : ")
-        builder.append(info.freeMemory().toFloat() / 1024 / 1024)
-        builder.append(LINE_SEPARATOR)
-        builder.append("Max Memory         : ")
-        builder.append(info.maxMemory() / 1024 / 1024)
+        val totalMemory = info.totalMemory() / 1048576L
+        val freeMemory = info.freeMemory().toFloat() / 1048576L
+        val usedMemory = totalMemory - freeMemory
+        val freeMemInPercentage = freeMemory * 100 / totalMemory
+        builder.append("Heap memory in MB  : Total - $totalMemory, Used - $usedMemory, Free - $freeMemory ($freeMemInPercentage%)")
+    }
+
+    private fun getDeviceRAM(context: Context, builder: StringBuilder) {
+        val memoryInfo = ActivityManager.MemoryInfo()
+        (context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(memoryInfo)
+        val totalRAM = memoryInfo.totalMem / 1048576L
+        val freeRAM = memoryInfo.availMem / 1048576L
+        val usedRAM = totalRAM - freeRAM
+        val freeRAMInPercentage = freeRAM * 100 / totalRAM
+        builder.append("RAM in MB          : Total - $totalRAM, Used - $usedRAM, Free - $freeRAM ($freeRAMInPercentage%)")
     }
 
     @Suppress("unused")
