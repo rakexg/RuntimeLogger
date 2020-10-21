@@ -1,3 +1,4 @@
 rootProject.name = "Runtime Logger"
 include ':demo'
 include ':runtimelogger'
+include ':runtimelogger-no-op'

@@ -1,5 +1,5 @@
 plugins {
-    id 'com.android.application'
+    id 'com.android.library'
     id 'kotlin-android'
 }
 
@@ -7,21 +7,19 @@ android {
     compileSdkVersion 29
 
     defaultConfig {
-        applicationId "com.rakeshgurudu.android.runtimelogger"
         minSdkVersion 16
         targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
+        versionCode 3
+        versionName "1.2.0"
 
-        manifestPlaceholders = [runtimeLoggerLauncherPrefix: "Demo"]
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
     }
 
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.debug
         }
     }
     compileOptions {
@@ -35,11 +33,6 @@ android {
 
 dependencies {
 
-    debugImplementation project(path: ':runtimelogger')
-    releaseImplementation project(path: ':runtimelogger-no-op')
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.3.1'
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'com.google.android.material:material:1.2.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
 }

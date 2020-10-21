@@ -175,6 +175,7 @@ object RuntimeLogger {
     /**
      * Call this method to end saving logs
      */
+    @Suppress("unused")
     fun endLogging(context: Context) {
         stopSession()
         NotificationManagerCompat.from(context).cancel(NOTIFICATION_ID)
