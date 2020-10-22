@@ -20,10 +20,14 @@
     <string name="stop_session">Stop</string>
     <string name="save_session">Save</string>
     <string name="runtime_logger_shared_prefs">runtime_logger_shared_prefs</string>
-    <string name="log_on_startup">log_on_startup</string>
+    <string name="pref_key_log_on_startup">log_on_startup</string>
+    <string name="pref_key_file_prefix">file_prefix</string>
     <string name="settings_screen">Settings</string>
     <string name="settings_app_startup_title">Log on app startup</string>
     <string name="app_startup_logging_enabled">Logging will be started on main app startup</string>
     <string name="app_startup_logging_disabled">Logging will be disabled on main app startup</string>
+    <string name="settings_title_file_prefix">Filename Prefix</string>
+    <string name="settings_sub_file_prefix">Prefix to use for log filenames</string>
+    <string name="filename_no_prefix">No Prefix</string>
 
 </resources>

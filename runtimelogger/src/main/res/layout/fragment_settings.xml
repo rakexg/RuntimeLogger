@@ -1,4 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?android:windowBackground"
@@ -12,6 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
+        android:textSize="16sp"
         android:layout_toStartOf="@id/appStartupSwitch"
         android:layout_toLeftOf="@id/appStartupSwitch"
         android:text="@string/settings_app_startup_title"
@@ -31,5 +33,43 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:padding="10dp" />
+        android:layout_alignParentEnd="true"
+        android:padding="10dp"
+        tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+    <RelativeLayout
+        android:id="@+id/filePrefixWrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/appStartupSubtitle"
+        android:layout_marginTop="25dp">
+
+        <TextView
+            android:id="@+id/filePrefixTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_title_file_prefix"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/filePrefix"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/filePrefixTitle"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:text="@string/filename_no_prefix"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/filePrefixSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/filePrefixTitle"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:text="@string/settings_sub_file_prefix" />
+    </RelativeLayout>
+
 </RelativeLayout>

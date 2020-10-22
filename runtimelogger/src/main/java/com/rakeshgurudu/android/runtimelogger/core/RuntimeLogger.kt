@@ -60,17 +60,20 @@ object RuntimeLogger {
      * Settings -> Developer Options -> Logger Buffer sizes, select 4M or 16M.
      */
     fun startLogging(context: Context) {
-        val logOnAppStartup = context.getSharedPreferences(
-            context.getString(R.string.runtime_logger_shared_prefs),
-            Context.MODE_PRIVATE
-        ).getBoolean(context.getString(R.string.log_on_startup), false)
+        val prefs = context.getSharedPreferences(
+                context.getString(R.string.runtime_logger_shared_prefs),
+                Context.MODE_PRIVATE
+        )
+        val logOnAppStartup =
+                prefs.getBoolean(context.getString(R.string.pref_key_log_on_startup), false)
         if (!logOnAppStartup && !startLoggingFromNotification) {
             appStartupOffNotification(context)
             return
         }
         startLoggingFromNotification = false
         startTime = System.currentTimeMillis()
-        fileName = dateFormat.format(startTime)
+        val filePrefix = prefs.getString(context.getString(R.string.pref_key_file_prefix), "")
+        fileName = filePrefix + dateFormat.format(startTime)
         logDirectoryPath = context.getExternalFilesDir(null)?.absolutePath + "/runtimelogger"
         stopLogging = false
         val thread = Thread(Runnable {
