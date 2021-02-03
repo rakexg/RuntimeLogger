@@ -11,7 +11,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        RuntimeLogger.startLogging(this@MainActivity)
+        RuntimeLogger.Builder()
+            .filePrefix("demo")
+            .logOnAppStartup(false)
+            .build(this@MainActivity)
+
         Thread(Runnable {
             var count = 0
             while (!stopLogging) {

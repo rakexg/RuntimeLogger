@@ -9,12 +9,24 @@ import android.content.Context
  */
 object RuntimeLogger {
 
+    class Builder {
+        fun filePrefix(filePrefix: String): Builder {
+            return this
+        }
+
+        fun logOnAppStartup(enable: Boolean): Builder {
+            return this
+        }
+
+        fun build(context: Context) {
+        }
+    }
+
     @Suppress("unused")
     fun startLogging(context: Context) {
     }
 
     @Suppress("unused")
     fun endLogging(context: Context) {
-
     }
 }

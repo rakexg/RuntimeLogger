@@ -18,7 +18,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.PrintStream
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 
 const val NOTIFICATION_ID = 3108
 const val CHANNEL_ID = "runtime_logger"
@@ -54,18 +54,44 @@ object RuntimeLogger {
     private val logRegexPattern =
         Regex("(\\d+)\\s+(\\d+-\\d+\\s+\\d+:\\d+:\\d+.\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(.)\\s+(.+?):\\s+(.+)")
 
+    class Builder {
+        private var logOnAppStartup: Boolean = false
+        private var filePrefix: String = ""
+
+        fun filePrefix(filePrefix: String): Builder {
+            this.filePrefix = filePrefix
+            return this
+        }
+
+        fun logOnAppStartup(enable: Boolean): Builder {
+            logOnAppStartup = enable
+            return this
+        }
+
+        fun build(context: Context) {
+            val editor = context.getSharedPreferences(
+                context.getString(R.string.runtime_logger_shared_prefs),
+                Context.MODE_PRIVATE
+            ).edit()
+            editor.putBoolean(context.getString(R.string.pref_key_log_on_startup), logOnAppStartup)
+            editor.putString(context.getString(R.string.pref_key_file_prefix), filePrefix)
+            editor.apply()
+            startLogging(context)
+        }
+    }
+
     /**
      * Call this method to start saving logs. The logs will be stored in app specific directory
      * of external storage. It is recommended to increase the device log buffer size from
      * Settings -> Developer Options -> Logger Buffer sizes, select 4M or 16M.
      */
-    fun startLogging(context: Context) {
+    private fun startLogging(context: Context) {
         val prefs = context.getSharedPreferences(
-                context.getString(R.string.runtime_logger_shared_prefs),
-                Context.MODE_PRIVATE
+            context.getString(R.string.runtime_logger_shared_prefs),
+            Context.MODE_PRIVATE
         )
         val logOnAppStartup =
-                prefs.getBoolean(context.getString(R.string.pref_key_log_on_startup), false)
+            prefs.getBoolean(context.getString(R.string.pref_key_log_on_startup), false)
         if (!logOnAppStartup && !startLoggingFromNotification) {
             appStartupOffNotification(context)
             return
