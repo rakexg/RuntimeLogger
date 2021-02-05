@@ -44,6 +44,9 @@ object RuntimeLogger {
     private val dateFormat = SimpleDateFormat("dd MMM yyyy HH:mm:ss", Locale.getDefault())
 
     @SuppressLint("ConstantLocale")
+    private val fileNameFormat = SimpleDateFormat("dd_MMM_yyyy_HH_mm_ss", Locale.getDefault())
+
+    @SuppressLint("ConstantLocale")
     private val logDateFormat = SimpleDateFormat("MM-dd HH:mm:ss.SSS", Locale.getDefault())
 
     /**
@@ -99,7 +102,7 @@ object RuntimeLogger {
         startLoggingFromNotification = false
         startTime = System.currentTimeMillis()
         val filePrefix = prefs.getString(context.getString(R.string.pref_key_file_prefix), "")
-        fileName = filePrefix + dateFormat.format(startTime)
+        fileName = filePrefix + fileNameFormat.format(startTime)
         logDirectoryPath = context.getExternalFilesDir(null)?.absolutePath + "/runtimelogger"
         stopLogging = false
         val thread = Thread(Runnable {
