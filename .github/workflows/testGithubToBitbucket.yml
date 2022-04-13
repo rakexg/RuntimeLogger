@@ -29,12 +29,12 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Run a multi-line script
-        run: |
+        uses: actions/checkout@v3
           echo Add other actions to build,
           echo test, and deploy your project.
           pwd
-#          git remote add origin_bitbucket https://rakex@bitbucket.org/rakex/runtimelogger.git
-#          git remote -v
+          git remote add origin_bitbucket https://rakex@bitbucket.org/rakex/runtimelogger.git
+          git remote -v
 #       - name: Install SSH Key
 #         uses: shimataro/ssh-key-action@v2.3.1
 #         with:
