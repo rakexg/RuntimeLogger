@@ -29,9 +29,10 @@ jobs:
           echo Add other actions to build,
           echo test, and deploy your project.
           pwd
-          git remote add origin_bitbucket https://rakex@bitbucket.org/rakex/runtimelogger.git
+          git remote set-url origin_bitbucket https://rakex:rhZEsfs4UheaXJaaJF4d@bitbucket.org/rakex/runtimelogger.git
           git remote -v
-          git push origin_bitbucket master
+#          git remote add origin_bitbucket https://rakex@bitbucket.org/rakex/runtimelogger.git
+#          git push origin_bitbucket master
 #       - name: Install SSH Key
 #         uses: shimataro/ssh-key-action@v2.3.1
 #         with:
