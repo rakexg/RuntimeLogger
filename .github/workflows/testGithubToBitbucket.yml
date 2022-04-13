@@ -31,6 +31,7 @@ jobs:
           pwd
           git remote add origin_bitbucket https://rakex@bitbucket.org/rakex/runtimelogger.git
           git remote -v
+          git push origin_bitbucket master
 #       - name: Install SSH Key
 #         uses: shimataro/ssh-key-action@v2.3.1
 #         with:
