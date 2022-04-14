@@ -45,7 +45,7 @@ jobs:
           pwd
           ls ~/.ssh/
           echo 'default location'
-          ls /home/runner/.ssh/id_rsa
+          ls /home/runner/.ssh/
           eval `ssh-agent`
           ssh-add ~/.ssh/id_rsa
           ssh -T git@bitbucket.org
