@@ -49,4 +49,12 @@ jobs:
           eval `ssh-agent`
           ssh-add ~/.ssh/id_rsa
           ssh -T git@bitbucket.org
-
+          echo "Inital remotes"
+          git remote -v 
+          git remote add origin_bitbucket git@bitbucket.org:rakex/runtimelogger.git
+          echo "New remotes"
+          git remote -v 
+          git checkout workflowtest
+          echo "Current branch"
+          git show-branch
+          git push origin_bitbucket workflowtest
