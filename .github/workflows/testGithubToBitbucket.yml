@@ -22,7 +22,7 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Run a multi-line script
         run: |
-          echo "token: '{{ secrets.BITBUCKET_TOKEN }}'"
+          echo "token: ${{ secrets.BITBUCKET_TOKEN }}"
 #          git remote add origin_bitbucket https://rakex:rhZEsfs4UheaXJaaJF4d@bitbucket.org/rakex/runtimelogger.git
 #          git remote -v 
 #          git checkout workflowtest
