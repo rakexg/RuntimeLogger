@@ -42,5 +42,7 @@ jobs:
           #if_key_exists: fail # replace / ignore / fail; optional (defaults to fail)
       - name: Run a multi-line script
         run: |
-          cat ~/.ssh/id_rsa.pub
+          pwd
+          ls /github/home/.ssh
+          cat /github/home/.ssh/id_rsa.pub
 
