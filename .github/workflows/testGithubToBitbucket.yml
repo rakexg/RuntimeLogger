@@ -44,7 +44,7 @@ jobs:
         run: |
           pwd
           ls ~/.ssh/
-          eval `ssh-agent`
           ssh-add -K ~/.ssh/id_rsa
           ssh -T git@bitbucket.org
+#          eval `ssh-agent`
 
