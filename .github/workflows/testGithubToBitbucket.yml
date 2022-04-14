@@ -31,9 +31,9 @@ jobs:
           pwd
           git remote add origin_bitbucket https://rakex:rhZEsfs4UheaXJaaJF4d@bitbucket.org/rakex/runtimelogger.git
           git remote -v 
+          git checkout workflowtest
           git show-branch
           git push origin_bitbucket workflowtest
-#          git checkout workflowtest
 #          git push -u origin_bitbucket workflowtest
 #          git remote add origin_bitbucket https://rakex@bitbucket.org/rakex/runtimelogger.git
 #          git remote add origin_bitbucket https://rakex:rhZEsfs4UheaXJaaJF4d@bitbucket.org/rakex/runtimelogger.git
