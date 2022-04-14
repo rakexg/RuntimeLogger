@@ -43,6 +43,5 @@ jobs:
       - name: Run a multi-line script
         run: |
           pwd
-          ls /github/home/.ssh
-          cat /github/home/.ssh/id_rsa.pub
+          ls ~/.ssh/
 
